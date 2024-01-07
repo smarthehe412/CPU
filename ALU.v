@@ -27,8 +27,8 @@ module ALU (
     output reg [   `ADDR_WID] result_pc
 );
 
-    wire [`DATA_WID] calc1 = val1,
-    wire [`DATA_WID] calc2 = opcode==`OPCODE_ARITH ? val2 : imm, //is imm or not
+    wire [`DATA_WID] calc1=val1,
+    wire [`DATA_WID] calc2=opcode==`OPCODE_ARITH ? val2 : imm, //is imm or not
     wire [`DATA_WID] res;
     always @(*) begin
         case(func3)
