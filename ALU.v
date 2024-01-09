@@ -1,3 +1,7 @@
+//需要实现运算
+//接受 RS 传来的运算
+//广播运算内容到 ...
+
 `ifndef ALU
 `define ALU
 `include "cons.v"

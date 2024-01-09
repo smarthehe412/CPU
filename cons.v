@@ -1,5 +1,6 @@
 `ifndef CONS
 `define CONS
+`endif
 
 `define REG_SIZE 32
 `define ROB_SIZE 16
@@ -47,7 +48,7 @@
 `define OPCODE_AUIPC  7'b0010111
 `define OPCODE_JAL    7'b1101111
 `define OPCODE_JALR   7'b1100111
-`define OPCODE_BR     7'b1100011
+`define OPCODE_B      7'b1100011
 
 `define FUNC3_ADD  3'h0
 `define FUNC3_SUB  3'h0

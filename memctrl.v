@@ -1,3 +1,8 @@
+//需要实现单字节读写
+//可能接受 ifetch, LSB 的请求
+//需要向 ifetch, LSB 与内存输出
+//需要提供是否已经读完的标识
+
 `ifndef MEMCTRL
 `define MEMCTRL
 `include "cons.v"

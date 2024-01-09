@@ -1,3 +1,7 @@
+//需要存储每个寄存器对指令的依赖
+//从 rob 和 decoder 接受更新信息
+//接受 decoder 查询一个寄存器的依赖（即时通信）
+
 `ifndef REGFILE
 `define REGFILE
 `include "cons.v"
