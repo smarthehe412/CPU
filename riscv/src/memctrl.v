@@ -48,23 +48,17 @@ module MemCtrl (
     reg [`ADDR_WID] store_addr;
     
     always @(posedge clk) begin
+        if_done<=0;
+        lsb_done<=0;
+        mem_rw<=0;
+        mem_addr<=0;
         if(rst) begin
             stat<=IDLE;
-            if_done<=0;
-            lsb_done<=0;
-            mem_rw<=0;
-            mem_addr<=0;
-        end else if(!rdy) begin
-            if_done<=0;
-            lsb_done<=0;
-            mem_rw<=0;
-            mem_addr<=0;
-        end else begin
+        end else if(rdy) begin
             case(stat)
                 IDLE: begin //remember 1 cycle delay, so if something_done then wait 1 cycle
                     if(if_done||lsb_done) begin
-                        if_done<=0;
-                        lsb_done<=0;
+                        ;
                     end else if(lsb_en) begin
                         if(lsb_rw) begin
                             stat<=STORE;
