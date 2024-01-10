@@ -4,15 +4,19 @@
 
 `define REG_SIZE 32
 `define ROB_SIZE 16
+`define RS_SIZE 16
+`define RS_NPOS 5'b16
 
 `define INST_WID 31:0
 `define DATA_WID 31:0
 `define ADDR_WID 31:0
 `define ROB_POS_WID 3:0
 `define REG_POS_WID 4:0
+`define RS_POS_WID 3:0
 // rob_id = {flag, rob_pos}
 // flag: 0 = ready, 1 = renamed
 `define ROB_ID_WID 4:0
+`define RS_ID_WID 4:0
 
 // Instruction Cache
 // total size = BLK_NUM * BLK_SIZE * INST_SIZE Bytes = 1024 Bytes

@@ -13,12 +13,10 @@ module MemCtrl (
 
     input wire rollback,
 
-    input  wire [ 7:0] mem_in,   // data input bus
-    output reg  [ 7:0] mem_out,  // data output bus
-    output reg  [31:0] mem_addr,  // address bus (only 17:0 is used)
+    input  wire [ 7:0] mem_in,
+    output reg  [ 7:0] mem_out,
+    output reg  [31:0] mem_addr,  //(only 17:0 is used)
     output reg         mem_rw,    // write/read signal (1 for write)
-
-    input wire io_buffer_full,  // 1 if uart buffer is full
 
     // instruction fetch
     input  wire                if_en,
@@ -28,7 +26,7 @@ module MemCtrl (
 
     // Load Store Buffer
     input  wire             lsb_en,
-    input  wire             lsb_rw,      // 1 = write
+    input  wire             lsb_rw,      //1 for write
     input  wire [`ADDR_WID] lsb_addr,
     input  wire [      2:0] lsb_len,
     input  wire [`DATA_WID] lsb_w_data,
