@@ -4,3 +4,4 @@ riscv/testspace/*
 *.vcd
 
 !.keep
+*:Zone.Identifier

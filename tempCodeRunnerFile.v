@@ -1,1 +1,0 @@
-MEM_CTRL_LEN_WID
