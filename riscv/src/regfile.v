@@ -13,44 +13,44 @@ module RegFile (
     input wire rollback,
 
     // query from Decoder, combinational
-    input  wire [`REG_POS_WID] rs1,
-    output reg  [   `DATA_WID] val1,
-    output reg  [ `ROB_ID_WID] rely1,
-    input  wire [`REG_POS_WID] rs2,
-    output reg  [   `DATA_WID] val2,
-    output reg  [ `ROB_ID_WID] rely2,
+    input  wire [`REG_POS_WID] decode_rs1,
+    output reg  [   `DATA_WID] decode_val1,
+    output reg  [ `ROB_ID_WID] decode_rely1,
+    input  wire [`REG_POS_WID] decode_rs2,
+    output reg  [   `DATA_WID] decode_val2,
+    output reg  [ `ROB_ID_WID] decode_rely2,
 
     // Decoder issue (telling an instruction need register ...)
-    input wire                issue,
-    input wire [`REG_POS_WID] issue_rd,
-    input wire [`ROB_POS_WID] issue_rob_pos,
+    input wire                decode,
+    input wire [`REG_POS_WID] decode_rd,
+    input wire [`ROB_POS_WID] decode_rob_pos,
 
     // ReorderBuffer commit (telling an instruction is commited)
-    input wire                commit,
-    input wire [`REG_POS_WID] commit_rd,
-    input wire [   `DATA_WID] commit_val,
-    input wire [`ROB_POS_WID] commit_rob_pos
+    input wire                rob_commit,
+    input wire [`REG_POS_WID] rob_commit_rd,
+    input wire [   `DATA_WID] rob_commit_val,
+    input wire [`ROB_POS_WID] rob_commit_rob_pos
 );
     reg [`DATA_WID] val[`REG_SIZE-1:0]; //registers
     reg [`ROB_ID_WID] rely[`REG_SIZE-1:0];  //{flag, rob_id}; flag: 0=ready, 1=renamed
 
     //answer queries from Decoder
-    reg is_real=(commit&&commit_rd!=5'b0); //is the commit actually changed registers
-    reg is_final=(rely[commit_rd]=={1'b1,commit_rob_pos});
+    reg is_real=(rob_commit&&rob_commit_rd!=5'b0); //is the commit actually changed registers
+    reg is_final=(rely[rob_commit_rd]=={1'b1,rob_commit_rob_pos});
     always @(*) begin
-        if(is_real&&is_final&&rs1==commit_rd) begin //just commited
-            val1=commit_val;
-            rely1=5'b0;
+        if(is_real&&is_final&&decode_rs1==rob_commit_rd) begin //just commited
+            decode_val1=rob_commit_val;
+            decode_rely1=5'b0;
         end else begin
-            val1=val[rs1];
-            rely1=rely[rs1];
+            decode_val1=val[decode_rs1];
+            decode_rely1=rely[decode_rs1];
         end
-        if(is_real&&is_final&&rs2==commit_rd) begin //just commited
-            val2=commit_val;
-            rely2=5'b0;
+        if(is_real&&is_final&&decode_rs2==rob_commit_rd) begin //just commited
+            decode_val2=rob_commit_val;
+            decode_rely2=5'b0;
         end else begin
-            val2=val[rs2];
-            rely2=rely[rs2];
+            decode_val2=val[decode_rs2];
+            decode_rely2=rely[decode_rs2];
         end
     end
 
@@ -64,11 +64,11 @@ module RegFile (
             end
         end else if(rdy) begin
             if(is_real) begin
-                val[commit_rd]<=commit_val;
-                if(is_final) rely[commit_rd]<=5'b0;
+                val[rob_commit_rd]<=rob_commit_val;
+                if(is_final) rely[rob_commit_rd]<=5'b0;
             end
-            if(issue&&issue_rd!=5'b0) begin
-                rely[issue_rd]<={1'b1,issue_rob_pos};//last assignment works
+            if(decode&&decode_rd!=5'b0) begin
+                rely[decode_rd]<={1'b1,decode_rob_pos};//last assignment works
             end
             if (rollback) begin
                 for(i=0;i<32;i=i+1) rely[i]<=5'b0;
@@ -76,3 +76,4 @@ module RegFile (
         end
     end
 endmodule
+`endif

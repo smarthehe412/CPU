@@ -1,11 +1,14 @@
+//from 1024th
 `ifndef CONS
 `define CONS
-`endif
 
 `define REG_SIZE 32
 `define ROB_SIZE 16
 `define RS_SIZE 16
 `define RS_NPOS 5'b16
+`define BP_SIZE 256
+`define LSB_SIZE 16
+`define LSB_NPOS 5'd16
 
 `define INST_WID 31:0
 `define DATA_WID 31:0
@@ -13,10 +16,12 @@
 `define ROB_POS_WID 3:0
 `define REG_POS_WID 4:0
 `define RS_POS_WID 3:0
+`define LSB_POS_WID 3:0
 // rob_id = {flag, rob_pos}
 // flag: 0 = ready, 1 = renamed
 `define ROB_ID_WID 4:0
 `define RS_ID_WID 4:0
+`define LSB_ID_WID 4:0
 
 // Instruction Cache
 // total size = BLK_NUM * BLK_SIZE * INST_SIZE Bytes = 1024 Bytes
@@ -29,6 +34,8 @@
 `define ICACHE_IDX_WID 3:0
 `define ICACHE_TAG_RANGE 31:10
 `define ICACHE_TAG_WID 21:0
+`define BP_IDX_RANGE 9:2
+`define BP_IDX_WID 7:0
 
 `define MEM_CTRL_LEN_WID 6:0  // 2^6 = 64 = ICACHE_BLK_SIZE
 `define MEM_CTRL_IF_DATA_LEN 64  // ICACHE_BLK_SIZE
@@ -65,10 +72,10 @@
 `define FUNC3_SLT  3'h2
 `define FUNC3_SLTU 3'h3
 
-`define FUNC7_ADD 1'b0
-`define FUNC7_SUB 1'b1
-`define FUNC7_SRL 1'b0
-`define FUNC7_SRA 1'b1
+`define FUNC1_ADD 1'b0
+`define FUNC1_SUB 1'b1
+`define FUNC1_SRL 1'b0
+`define FUNC1_SRA 1'b1
 
 `define FUNC3_ADDI  3'h0
 `define FUNC3_XORI  3'h4
@@ -80,8 +87,8 @@
 `define FUNC3_SLTI  3'h2
 `define FUNC3_SLTUI 3'h3
 
-`define FUNC7_SRLI 1'b0
-`define FUNC7_SRAI 1'b1
+`define FUNC1_SRLI 1'b0
+`define FUNC1_SRAI 1'b1
 
 `define FUNC3_LB  3'h0
 `define FUNC3_LH  3'h1
@@ -99,3 +106,5 @@
 `define FUNC3_BGE  3'h5
 `define FUNC3_BLTU 3'h6
 `define FUNC3_BGEU 3'h7
+
+`endif

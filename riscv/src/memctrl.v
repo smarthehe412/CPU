@@ -13,20 +13,18 @@ module MemCtrl (
 
     input wire rollback,
 
-    input  wire [ 7:0] mem_in,
-    output reg  [ 7:0] mem_out,
-    output reg  [31:0] mem_addr,  //(only 17:0 is used)
-    output reg         mem_rw,    // write/read signal (1 for write)
+    input  wire [ 7:0]          mem_in,
+    output wire [ 7:0]          mem_out,
+    output wire [31:0]          mem_addr,			
+    output wire                 mem_rw,
 
-    // instruction fetch
     input  wire                if_en,
     input  wire [   `ADDR_WID] if_pc,
     output reg                 if_done,
     output wire [`IF_DATA_WID] if_data,
 
-    // Load Store Buffer
     input  wire             lsb_en,
-    input  wire             lsb_rw,      //1 for write
+    input  wire             lsb_rw,
     input  wire [`ADDR_WID] lsb_addr,
     input  wire [      2:0] lsb_len,
     input  wire [`DATA_WID] lsb_w_data,
@@ -37,7 +35,7 @@ module MemCtrl (
     reg [7:0] if_data_arr[`MEM_CTRL_IF_DATA_LEN-1:0];
     genvar _i;
     generate
-        for (_i=0;_i<`MEM_CTRL_IF_DATA_LEN;_i=_i+1) begin
+        for(_i=0;_i<`MEM_CTRL_IF_DATA_LEN;_i=_i+1) begin
             assign if_data[_i*8+7:_i*8]=if_data_arr[_i];
         end
     endgenerate
@@ -50,13 +48,13 @@ module MemCtrl (
     reg [`ADDR_WID] store_addr;
     
     always @(posedge clk) begin
-        if (rst) begin
+        if(rst) begin
             stat<=IDLE;
             if_done<=0;
             lsb_done<=0;
             mem_rw<=0;
             mem_addr<=0;
-        end else if (!rdy) begin
+        end else if(!rdy) begin
             if_done<=0;
             lsb_done<=0;
             mem_rw<=0;
@@ -144,3 +142,4 @@ module MemCtrl (
         end
     end
 endmodule
+`endif
