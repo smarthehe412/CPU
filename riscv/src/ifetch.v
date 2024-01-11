@@ -14,10 +14,10 @@ module IFetch (
     input wire lsb_full,
     input wire rob_full,
 
-    output reg             if_inst_rdy,
-    output reg [`INST_WID] if_inst,
-    output reg [`ADDR_WID] if_inst_pc,
-    output reg             if_inst_pre_jump,
+    output reg             decode_inst_rdy,
+    output reg [`INST_WID] decode_inst,
+    output reg [`ADDR_WID] decode_inst_pc,
+    output reg             decode_inst_pre_jump,
 
     output reg                 memc_en,
     output reg  [   `ADDR_WID] memc_pc,

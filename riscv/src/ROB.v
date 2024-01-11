@@ -29,14 +29,14 @@ module ROB(
     input  wire [`ROB_POS_WID] decode_rs2_pos,
     output wire                decode_rs2_ready,
     output wire [   `DATA_WID] decode_rs2_val,
-    output wire [`ROB_POS_WID] decode_nxt_rob_pos,
+    output wire [`ROB_POS_WID] decode_nxt_pos,
 
     output reg                reg_commit,
     output reg [`REG_POS_WID] reg_commit_rd,
     output reg [   `DATA_WID] reg_commit_val,
     output reg [`ROB_POS_WID] reg_commit_rob_pos,
 
-    output reg                lsb_commit_store;
+    output reg                lsb_commit_store,
     output reg [`ROB_POS_WID] lsb_rob_pos,
 
     input wire                alu_result,
@@ -64,7 +64,7 @@ module ROB(
     reg [`REG_POS_WID] nxt_tail= tail+decode;
     wire is_nxt_empty=(nxt_head==nxt_tail)&&(is_empty||is_commit||!decode);
     assign rob_full=(nxt_head==nxt_tail)&&!is_nxt_empty;
-    assign decode_nxt_rob_pos=tail;
+    assign decode_nxt_pos=tail;
 
     assign decode_rs1_ready=ready[decode_rs1_pos];
     assign decode_rs1_val=val[decode_rs1_pos];

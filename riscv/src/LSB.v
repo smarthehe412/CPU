@@ -10,7 +10,7 @@ module LSB(
     input wire rdy,
 
     input wire rollback,
-    output wire lsb_full;
+    output wire lsb_full,
 
     input wire                decode,
     input wire [  `FUNC3_WID] decode_func3,
@@ -31,9 +31,9 @@ module LSB(
     output reg  [      2:0] memc_len,
     output reg  [`DATA_WID] memc_w_data,
     input  wire             memc_done,
-    input  wire [`DATA_WID] memc_r_data
+    input  wire [`DATA_WID] memc_r_data,
 
-    input wire                rob_commit_store;
+    input wire                rob_commit_store,
     input wire [`ROB_POS_WID] rob_rob_pos,
 
     input wire                alu_result,
@@ -41,7 +41,7 @@ module LSB(
     input wire [   `DATA_WID] alu_result_val,
     input wire                lsb_result,
     input wire [`ROB_POS_WID] lsb_result_rob_pos,
-    input wire [   `DATA_WID] lsb_result_val
+    input wire [   `DATA_WID] lsb_result_val,
 
     output reg                result,
     output reg [`ROB_POS_WID] result_rob_pos,

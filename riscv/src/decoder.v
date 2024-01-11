@@ -14,13 +14,12 @@ module Decoder (
 
     input wire rollback,
 
-    // from Instruction Fetcher
     input wire             if_inst_rdy,
     input wire [`INST_WID] if_inst,
     input wire [`ADDR_WID] if_inst_pc,
-    input wire             if_inst_pred_jump,
+    input wire             if_inst_pre_jump,
 
-    output reg                issue,
+    output reg                decode,
     output reg [ `OPCODE_WID] opcode,
     output reg [  `FUNC3_WID] func3,
     output reg                func1,
@@ -77,7 +76,7 @@ module Decoder (
         pre_jump=if_inst_pre_jump;
         rob_pos=nxt_rob_pos;
 
-        issue=0;
+        decode=0;
         rs_en=0;
         lsb_en=0;
         is_ready=0;
@@ -89,7 +88,7 @@ module Decoder (
         rs2_rob_id=0;
 
         if(!rst&&rdy&&!rollback&&if_inst_rdy) begin
-            issue=1;
+            decode=1;
             if(reg_rs1_pos_id[4]==0) begin//flag
                 rs1_val=reg_rs1_val;
             end else if(rob_rs1_ready) begin
