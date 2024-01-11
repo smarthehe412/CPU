@@ -5,10 +5,11 @@
 `define REG_SIZE 32
 `define ROB_SIZE 16
 `define RS_SIZE 16
-`define RS_NPOS 5'b16
+`define RS_NPOS 5'd16
 `define BP_SIZE 256
 `define LSB_SIZE 16
 `define LSB_NPOS 5'd16
+`define BHT_SIZE 256
 
 `define INST_WID 31:0
 `define DATA_WID 31:0
@@ -21,7 +22,7 @@
 // flag: 0 = ready, 1 = renamed
 `define ROB_ID_WID 4:0
 `define RS_ID_WID 4:0
-`define LSB_ID_WID 4:0
+`define LSB_ID_WID 4:0  
 
 // Instruction Cache
 // total size = BLK_NUM * BLK_SIZE * INST_SIZE Bytes = 1024 Bytes
@@ -36,6 +37,8 @@
 `define ICACHE_TAG_WID 21:0
 `define BP_IDX_RANGE 9:2
 `define BP_IDX_WID 7:0
+`define BHT_IDX_RANGE 9:2
+`define BHT_IDX_WID 7:0
 
 `define MEM_CTRL_LEN_WID 6:0  // 2^6 = 64 = ICACHE_BLK_SIZE
 `define MEM_CTRL_IF_DATA_LEN 64  // ICACHE_BLK_SIZE

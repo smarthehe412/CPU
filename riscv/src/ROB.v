@@ -60,8 +60,8 @@ module ROB(
     reg [`REG_POS_WID] head,tail;
     reg is_empty;
     wire is_commit=!is_empty && ready[head];
-    reg [`REG_POS_WID] nxt_head= head+is_commit; //safe for overflow
-    reg [`REG_POS_WID] nxt_tail= tail+decode;
+    wire [`REG_POS_WID] nxt_head= head+is_commit; //safe for overflow
+    wire [`REG_POS_WID] nxt_tail= tail+decode;
     wire is_nxt_empty=(nxt_head==nxt_tail)&&(is_empty||is_commit||!decode);
     assign rob_full=(nxt_head==nxt_tail)&&!is_nxt_empty;
     assign decode_nxt_pos=tail;
@@ -90,7 +90,7 @@ module ROB(
                 opcode[i]<=0;
                 pre_jump[i]<=0;
                 is_jump[i]<=0;
-                res_pc[i]<=0;
+                nxt_pc[i]<=0;
             end
         end
         else if(rdy) begin
@@ -113,7 +113,7 @@ module ROB(
             if(is_commit) begin
                 reg_commit<=1;
                 reg_commit_rob_pos<=head;
-                case(opcode)
+                case(opcode[head])
                     `OPCODE_LUI, `OPCODE_AUIPC, `OPCODE_ARITH, `OPCODE_ARITHI: begin
                         reg_commit_rd<=rd[head];
                         reg_commit_val<=val[head];
@@ -122,16 +122,16 @@ module ROB(
                         reg_commit_rd<=rd[head];
                         reg_commit_val<=val[head];
                         if_set_pc_en<=1;
-                        if_set_pc<=res_pc[head];
+                        if_set_pc<=nxt_pc[head];
                     end
-                    `OPCODE_BR: begin
+                    `OPCODE_B: begin
                         if_br<=1;
                         if_br_jump<=is_jump[head];
                         if_br_pc<=pc[head];
                         if(pre_jump[head]!=is_jump[head]) begin
                             rollback<=1;
                             if_set_pc_en<=1;
-                            if_set_pc<=res_pc[head];
+                            if_set_pc<=nxt_pc[head];
                         end
                     end
                     `OPCODE_S: begin

@@ -14,9 +14,9 @@ module MemCtrl (
     input wire rollback,
 
     input  wire [ 7:0]          mem_in,
-    output wire [ 7:0]          mem_out,
-    output wire [31:0]          mem_addr,			
-    output wire                 mem_rw,
+    output reg  [ 7:0]          mem_out,
+    output reg  [31:0]          mem_addr,			
+    output reg                 mem_rw,
 
     input  wire                if_en,
     input  wire [   `ADDR_WID] if_pc,
@@ -30,9 +30,10 @@ module MemCtrl (
     input  wire [`DATA_WID] lsb_w_data,
     output reg              lsb_done,
     output reg  [`DATA_WID] lsb_r_data
-)
+);
     //for iCache
-    reg [7:0] if_data_arr[`MEM_CTRL_IF_DATA_LEN-1:0];
+    reg [7:0] if_data_arr [`MEM_CTRL_IF_DATA_LEN-1:0];
+
     genvar _i;
     generate
         for(_i=0;_i<`MEM_CTRL_IF_DATA_LEN;_i=_i+1) begin
@@ -41,8 +42,8 @@ module MemCtrl (
     endgenerate
 
     localparam IDLE=0,IFETCH=1,LOAD=2,STORE=3;
-    reg [1:0]               stat,
-    reg [`MEM_CTRL_LEN_WID] pos,
+    reg [1:0]               stat;
+    reg [`MEM_CTRL_LEN_WID] pos;
     reg [`MEM_CTRL_LEN_WID] len;
 
     reg [`ADDR_WID] store_addr;

@@ -66,8 +66,8 @@ module LSB(
     reg is_empty;
     wire is_solve=!is_empty && (rs1_rob_id[head][4]==0&&rs2_rob_id[head][4]==0) && ((!is_store[head] && !rollback) || committed[head]);
     wire finish=status==WAIT && memc_done;
-    reg nxt_head=head+finish;
-    reg nxt_tail=tail+decode;
+    wire nxt_head=head+finish;
+    wire nxt_tail=tail+decode;
     wire is_nxt_empty=(nxt_head==nxt_tail)&&(is_empty||finish||!decode);
     assign lsb_full=(nxt_head==nxt_tail)&&!is_nxt_empty;
     
@@ -84,7 +84,6 @@ module LSB(
             tail<=0;
             is_empty<=1;
             result<=0;
-            lsb_full<=0;
             checkpoint<=`LSB_NPOS;
             for(i=0;i<`LSB_SIZE;i=i+1) begin
                 busy[i]<=0;
@@ -140,11 +139,11 @@ module LSB(
                     if(!is_store[head]) begin
                         result<=1;
                         case(func3[head])
-                            `FUNCT3_LB:  result_val<={{24{mc_r_data[7]}}, mc_r_data[7:0]};
-                            `FUNCT3_LBU: result_val<={24'b0, mc_r_data[7:0]};
-                            `FUNCT3_LH:  result_val<={{16{mc_r_data[15]}}, mc_r_data[15:0]};
-                            `FUNCT3_LHU: result_val<={16'b0, mc_r_data[15:0]};
-                            `FUNCT3_LW:  result_val<=mc_r_data; 
+                            `FUNC3_LB:  result_val<={{24{memc_r_data[7]}}, memc_r_data[7:0]};
+                            `FUNC3_LBU: result_val<={24'b0, memc_r_data[7:0]};
+                            `FUNC3_LH:  result_val<={{16{memc_r_data[15]}}, memc_r_data[15:0]};
+                            `FUNC3_LHU: result_val<={16'b0, memc_r_data[15:0]};
+                            `FUNC3_LW:  result_val<=memc_r_data; 
                         endcase
                         result_rob_pos<=rob_pos[head];
                     end

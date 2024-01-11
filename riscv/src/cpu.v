@@ -162,7 +162,7 @@ ALU t_ALU(
     .result_pc(alu_result_pc)
 );
 
-decoder t_decoder(
+Decoder t_Decoder(
     .rst(rst_in),
     .rdy(rdy_in),
     .rollback(rollback),

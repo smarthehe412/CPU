@@ -59,7 +59,7 @@ module RS (
     reg [`ROB_POS_WID] rob_pos    [`RS_SIZE-1:0];
     reg                ready      [`RS_SIZE-1:0];
 
-    reg [`RS_ID_WID] tmp_free,tmp_ready;
+    reg [`RS_ID_WID] tmp_free, tmp_ready;
     //Monitor
     integer i;
     always @(*) begin
@@ -101,11 +101,11 @@ module RS (
             end
             if(alu_result) begin //alu broadcast
                 for(i=0;i<`RS_SIZE;i=i+1) begin
-                    if(rs1_rob_id=={1'b1,alu_result_rob_pos}) begin
+                    if(rs1_rob_id[i]=={1'b1,alu_result_rob_pos}) begin
                         rs1_val[i]<=alu_result_val;
                         rs1_rob_id[i]<=0;
                     end
-                    if(rs2_rob_id=={1'b1,alu_result_rob_pos}) begin
+                    if(rs2_rob_id[i]=={1'b1,alu_result_rob_pos}) begin
                         rs2_val[i]<=alu_result_val;
                         rs2_rob_id[i]<=0;
                     end
@@ -113,11 +113,11 @@ module RS (
             end
             if(lsb_result) begin //lsb broadcast
                 for(i=0;i<`RS_SIZE;i=i+1) begin
-                    if(rs1_rob_id=={1'b1,lsb_result_rob_pos}) begin
+                    if(rs1_rob_id[i]=={1'b1,lsb_result_rob_pos}) begin
                         rs1_val[i]<=lsb_result_val;
                         rs1_rob_id[i]<=0;
                     end
-                    if(rs2_rob_id=={1'b1,lsb_result_rob_pos}) begin
+                    if(rs2_rob_id[i]=={1'b1,lsb_result_rob_pos}) begin
                         rs2_val[i]<=lsb_result_val;
                         rs2_rob_id[i]<=0;
                     end
@@ -127,7 +127,7 @@ module RS (
                 opcode[tmp_free]<=decode_opcode;
                 func3[tmp_free]<=decode_func3;
                 func1[tmp_free]<=decode_func1;
-                rs1_rob_id[tmp_free]<=d_rs1_rob_id;
+                rs1_rob_id[tmp_free]<=decode_rs1_rob_id;
                 rs1_val[tmp_free]<=decode_rs1_val;
                 rs2_rob_id[tmp_free]<=decode_rs2_rob_id;
                 rs2_val[tmp_free]<=decode_rs2_val;

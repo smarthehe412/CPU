@@ -29,9 +29,9 @@ module ALU (
     output reg [   `ADDR_WID] result_pc
 );
 
-    wire [`DATA_WID] calc1=val1,
-    wire [`DATA_WID] calc2=opcode==`OPCODE_ARITH ? val2 : imm, //is imm or not
-    wire [`DATA_WID] res;
+    wire [`DATA_WID] calc1=val1;
+    wire [`DATA_WID] calc2=opcode==`OPCODE_ARITH ? val2 : imm; //is imm or not
+    reg [`DATA_WID] res;
     reg is_branch;
     always @(*) begin
         case(func3)
@@ -71,8 +71,8 @@ module ALU (
                 result_jump<=0;
                 result_pc<=pc+4;
                 case(opcode)
-                    `OPCODE_ARITH,`OPCODE_ARITHI: result_val<=res;
-                    `OPCODE_BR:
+                    `OPCODE_ARITH, `OPCODE_ARITHI: result_val<=res;
+                    `OPCODE_B: begin
                         if(is_branch) begin
                             result_jump<=1;
                             result_pc<=pc+imm;
@@ -80,8 +80,9 @@ module ALU (
                             result_jump<=0;
                             result_pc<=pc+4;
                         end
+                    end
                     `OPCODE_LUI: result_val<=imm; //imm shifted
-                    `OPCODE_AUIPC: result_val<=pc+imm
+                    `OPCODE_AUIPC: result_val<=pc+imm;
                     `OPCODE_JAL: begin
                         result_jump<=1;
                         result_val<=pc+4;

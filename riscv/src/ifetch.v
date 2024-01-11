@@ -48,8 +48,8 @@ module IFetch (
     wire [`ICACHE_IDX_WID] pc_index = pc[`ICACHE_IDX_RANGE];
     wire [`ICACHE_TAG_WID] pc_tag = pc[`ICACHE_TAG_RANGE];
     wire hit = icache_is[pc_index] && (icache_tag[pc_index] == pc_tag);
-    wire [`ICACHE_IDX_WID] mc_pc_index = mc_pc[`ICACHE_IDX_RANGE];
-    wire [`ICACHE_TAG_WID] mc_pc_tag = mc_pc[`ICACHE_TAG_RANGE];
+    wire [`ICACHE_IDX_WID] memc_pc_index = memc_pc[`ICACHE_IDX_RANGE];
+    wire [`ICACHE_TAG_WID] memc_pc_tag = memc_pc[`ICACHE_TAG_RANGE];
 
     wire [`ICACHE_BLK_WID] cur_block_raw = icache_data[pc_index];
     wire [`INST_WID] cur_block[15:0];
@@ -84,7 +84,7 @@ module IFetch (
     end
 
     // Branch Predictor
-    wire [`BHT_IDX_WID] pc_bp_index=pc[`BHT_IDX_RANGE];
+    wire [`BHT_IDX_WID] pc_bht_index=pc[`BHT_IDX_RANGE];
     always @(*) begin
         pre_pc=pc+4;
         pre_jump=0;
@@ -93,8 +93,8 @@ module IFetch (
                 pre_pc=pc+{{12{tmp_inst[31]}},tmp_inst[19:12],tmp_inst[20],tmp_inst[30:21],1'b0};
                 pre_jump=1;
             end
-            `OPCODE_BR: begin
-                if (bht[pc_bht_idx]>=2'd2) begin
+            `OPCODE_B: begin
+                if (bp[pc_bht_index]>=2'd2) begin
                     pre_pc=pc+{{20{tmp_inst[31]}},tmp_inst[7],tmp_inst[30:25],tmp_inst[11:8],1'b0};
                     pre_jump=1;
                 end
@@ -113,24 +113,24 @@ module IFetch (
             for(i=0;i<`ICACHE_BLK_NUM;i=i+1) begin
                 icache_is[i]<=0;
             end
-            if_inst_rdy<=0;
+            decode_inst_rdy<=0;
             status<=IDLE;
         end else if(!rdy) begin
             ;
         end else begin
             //to decoder
             if(rob_set_pc_en) begin
-                if_inst_rdy<=0;
+                decode_inst_rdy<=0;
                 pc<=rob_set_pc;
             end else begin
                 if(hit&&!rob_full&&!lsb_full&&!rs_full) begin
-                    if_inst_rdy<=1;
-                    if_inst<=tmp_inst;
-                    if_inst_pc<=pc;
+                    decode_inst_rdy<=1;
+                    decode_inst<=tmp_inst;
+                    decode_inst_pc<=pc;
                     pc<=pre_pc;
-                    if_inst_pre_jump<=pre_jump;
+                    decode_inst_pre_jump<=pre_jump;
                 end else begin
-                    if_inst_rdy<=0;
+                    decode_inst_rdy<=0;
                 end
             end
             if(status==IDLE) begin
