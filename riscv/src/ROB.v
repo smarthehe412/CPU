@@ -57,12 +57,12 @@ module ROB(
     reg                is_jump  [`ROB_SIZE-1:0];
     reg [   `ADDR_WID] nxt_pc   [`ROB_SIZE-1:0];
 
-    reg [`REG_POS_WID] head,tail;
+    reg [`ROB_POS_WID] head,tail;
     reg is_empty;
     wire is_commit=!is_empty && ready[head];
-    wire [`REG_POS_WID] nxt_head= head+is_commit; //safe for overflow
-    wire [`REG_POS_WID] nxt_tail= tail+decode;
-    wire is_nxt_empty=(nxt_head==nxt_tail)&&(is_empty||is_commit||!decode);
+    wire [`ROB_POS_WID] nxt_head= head+is_commit; //safe for overflow
+    wire [`ROB_POS_WID] nxt_tail= tail+decode;
+    wire is_nxt_empty=(nxt_head==nxt_tail)&&(is_empty||(is_commit&&!decode));
     assign rob_full=(nxt_head==nxt_tail)&&!is_nxt_empty;
     assign decode_nxt_pos=tail;
 
@@ -92,15 +92,16 @@ module ROB(
                 is_jump[i]<=0;
                 nxt_pc[i]<=0;
             end
-        end
-        else if(rdy) begin
+        end else if(rdy) begin
             head<=nxt_head;
             tail<=nxt_tail;
             is_empty<=is_nxt_empty;
+            reg_commit<=0;
             if_set_pc_en<=0;
             if_br<=0;
             lsb_commit_store<=0;
             if(decode) begin
+                //if(decode_pc<=32'h00001500) $display("%h %b",decode_pc,decode_opcode);
                 ready[tail]<=decode_is_ready;
                 rd[tail]<=decode_rd;
                 val[tail]<=0;
@@ -111,16 +112,19 @@ module ROB(
                 nxt_pc[tail]<=0;
             end
             if(is_commit) begin
-                reg_commit<=1;
+                //$display("%h %b",pc[head],opcode[head]);
                 reg_commit_rob_pos<=head;
                 case(opcode[head])
-                    `OPCODE_LUI, `OPCODE_AUIPC, `OPCODE_ARITH, `OPCODE_ARITHI: begin
+                    `OPCODE_LUI, `OPCODE_AUIPC, `OPCODE_ARITH, `OPCODE_ARITHI, `OPCODE_JAL: begin
+                        reg_commit<=1;
                         reg_commit_rd<=rd[head];
                         reg_commit_val<=val[head];
                     end
-                    `OPCODE_JAL, `OPCODE_JALR: begin
+                    `OPCODE_JALR: begin
+                        reg_commit<=1;
                         reg_commit_rd<=rd[head];
                         reg_commit_val<=val[head];
+                        rollback<=1;
                         if_set_pc_en<=1;
                         if_set_pc<=nxt_pc[head];
                     end

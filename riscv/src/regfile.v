@@ -35,7 +35,7 @@ module RegFile (
     reg [`ROB_ID_WID] rob_id[`REG_SIZE-1:0];  //{flag, rob_pos}; flag: 0=ready, 1=renamed
 
     //answer queries from Decoder
-    wire is_real=(rob_commit&&rob_commit_rd!=5'b0); //is the commit actually changed registers
+    wire is_real=(rob_commit&&rob_commit_rd!=0); //is the commit actually changed registers
     wire is_final=(rob_id[rob_commit_rd]=={1'b1,rob_commit_rob_pos});
     always @(*) begin
         if(is_real&&is_final&&decode_rs1==rob_commit_rd) begin //just commited
@@ -68,9 +68,9 @@ module RegFile (
                 if(is_final) rob_id[rob_commit_rd]<=5'b0;
             end
             if(decode&&decode_rd!=5'b0) begin
-                rob_id[decode_rd]<={1'b1,decode_rob_pos};//last assignment works
+                rob_id[decode_rd]<={1'b1,decode_rob_pos};
             end
-            if (rollback) begin
+            if(rollback) begin
                 for(i=0;i<32;i=i+1) rob_id[i]<=5'b0;
             end
         end

@@ -16,7 +16,7 @@ module RS (
     output reg rs_full,
 
     // issue instruction
-    input wire                decode,
+    input wire                decode_en,
     input wire [`ROB_POS_WID] decode_rob_pos,
     input wire [ `OPCODE_WID] decode_opcode,
     input wire [  `FUNC3_WID] decode_func3,
@@ -74,7 +74,7 @@ module RS (
                     tmp_ready=i;
                 end
             end else begin
-                if(!decode || !tmp_free[4]) rs_full=0;
+                if(!decode_en || !tmp_free[4]) rs_full=0;
                 tmp_free=i;
             end
         end
@@ -87,6 +87,7 @@ module RS (
             end
             alu_en<=0;
         end else if(rdy) begin
+            alu_en<=0;
             if(tmp_ready[4]==0) begin //send to ALU
                 alu_en<=1;
                 alu_opcode<=opcode[tmp_ready];
@@ -123,7 +124,7 @@ module RS (
                     end
                 end
             end
-            if(decode) begin //new instruction
+            if(decode_en) begin //new instruction
                 opcode[tmp_free]<=decode_opcode;
                 func3[tmp_free]<=decode_func3;
                 func1[tmp_free]<=decode_func1;

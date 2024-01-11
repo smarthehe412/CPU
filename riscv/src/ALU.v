@@ -47,12 +47,17 @@ module ALU (
                 else res=calc1>>calc2[5:0]; //SRL
             `FUNC3_SLT: res=$signed(calc1)<$signed(calc2);
             `FUNC3_SLTU: res=calc1<calc2;
+        endcase
+    end
+    always @(*) begin
+        case(func3)
             `FUNC3_BEQ: is_branch=val1==val2;
             `FUNC3_BNE: is_branch=val1!=val2;
             `FUNC3_BLT: is_branch=$signed(val1)<$signed(val2);
             `FUNC3_BGE: is_branch=$signed(val1)>=$signed(val2);
             `FUNC3_BLTU: is_branch=val1<val2;
             `FUNC3_BGEU: is_branch=val1>=val2;
+            default: is_branch=0;
         endcase
     end
 

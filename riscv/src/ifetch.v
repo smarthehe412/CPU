@@ -72,9 +72,7 @@ module IFetch (
     always @(posedge clk) begin
         if(rst) begin
             for(i=0;i<`BP_SIZE;i=i+1) bp[i]<=0;
-        end else if (!rdy) begin
-            ;
-        end else if (rob_br) begin
+        end else if (rdy&&rob_br) begin
             if(rob_br_jump) begin
                 if(bp[bp_index]<2'd3) bp[bp_index]<=bp[bp_index]+1;
             end else begin
@@ -108,16 +106,12 @@ module IFetch (
         if(rst) begin
             pc<=0;
             status<=IDLE;
-            memc_pc<=0;
             memc_en<=0;
             for(i=0;i<`ICACHE_BLK_NUM;i=i+1) begin
                 icache_is[i]<=0;
             end
             decode_inst_rdy<=0;
-            status<=IDLE;
-        end else if(!rdy) begin
-            ;
-        end else begin
+        end else if(rdy) begin
             //to decoder
             if(rob_set_pc_en) begin
                 decode_inst_rdy<=0;
@@ -142,9 +136,9 @@ module IFetch (
             end else begin //wait memctrl
                 if(memc_done) begin //done
                     memc_en<=0;
-                    icache_is[pc_index]<=1;
-                    icache_tag[pc_index]<=pc_tag;
-                    icache_data[pc_index]<=memc_data;
+                    icache_is[memc_pc_index]<=1;
+                    icache_tag[memc_pc_index]<=memc_pc_tag;
+                    icache_data[memc_pc_index]<=memc_data;
                     status<=IDLE;
                 end
             end

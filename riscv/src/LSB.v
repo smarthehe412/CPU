@@ -12,7 +12,7 @@ module LSB(
     input wire rollback,
     output wire lsb_full,
 
-    input wire                decode,
+    input wire                decode_en,
     input wire [  `FUNC3_WID] decode_func3,
     input wire                decode_func1,
     input wire [   `DATA_WID] decode_rs1_val,
@@ -48,7 +48,7 @@ module LSB(
     output reg [   `DATA_WID] result_val
 );
     localparam IDLE=0,WAIT=1;
-    reg [1:0] status;
+    reg status;
 
     reg                busy       [`LSB_SIZE-1:0];
     reg                is_store   [`LSB_SIZE-1:0];
@@ -65,10 +65,10 @@ module LSB(
     reg [`LSB_ID_WID] checkpoint;
     reg is_empty;
     wire is_solve=!is_empty && (rs1_rob_id[head][4]==0&&rs2_rob_id[head][4]==0) && ((!is_store[head] && !rollback) || committed[head]);
-    wire finish=status==WAIT && memc_done;
-    wire nxt_head=head+finish;
-    wire nxt_tail=tail+decode;
-    wire is_nxt_empty=(nxt_head==nxt_tail)&&(is_empty||finish||!decode);
+    wire finish= status==WAIT && memc_done;
+    wire [`LSB_POS_WID] nxt_head=head+finish;
+    wire [`LSB_POS_WID] nxt_tail=tail+decode_en;
+    wire is_nxt_empty=(nxt_head==nxt_tail)&&(is_empty||(finish&&!decode_en));
     assign lsb_full=(nxt_head==nxt_tail)&&!is_nxt_empty;
     
     integer i;
@@ -76,7 +76,6 @@ module LSB(
         head<=nxt_head;
         tail<=nxt_tail;
         is_empty<=is_nxt_empty;
-        memc_en<=0;
         result<=0;
         if(rst||(rollback&&checkpoint==`LSB_NPOS)) begin
             status<=IDLE;
@@ -98,13 +97,15 @@ module LSB(
                 committed[i]<=0;
             end
         end else if(rollback) begin
+            //$display("%h %b %b %b",rob_pos[head],rs1_rob_id[head],rs2_rob_id[head],committed[head]);
+            tail<=checkpoint+1;
             for(i=0;i<`LSB_SIZE;i=i+1) begin
                 if(!committed[i]) begin
                     busy[i]<=0;
                 end
             end
             //clear head
-            if(status==WAIT&&memc_done) begin
+            if(finish) begin
                 busy[head]<=0;
                 committed[head]<=0;
                 if(checkpoint[`LSB_POS_WID]==head) begin
@@ -181,7 +182,7 @@ module LSB(
                     end
                 end
             end
-            if(decode) begin
+            if(decode_en) begin
                 busy[tail]<=1;
                 is_store[tail]<=decode_is_store;
                 func3[tail]<=decode_func3;
