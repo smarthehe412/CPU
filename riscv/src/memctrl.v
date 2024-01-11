@@ -45,8 +45,7 @@ module MemCtrl (
     reg [1:0]               stat;
     reg [`MEM_CTRL_LEN_WID] pos;
     reg [`MEM_CTRL_LEN_WID] len;
-
-    reg [`ADDR_WID] store_addr;
+    reg [`ADDR_WID]         store_addr;
     
     always @(posedge clk) begin
         if(rst) begin
@@ -63,7 +62,7 @@ module MemCtrl (
         end else begin
             case(stat)
                 IDLE: begin //remember 1 cycle delay, so if something_done then wait 1 cycle
-                    if(if_done||lsb_done) begin
+                    if(if_done||lsb_done||rollback) begin
                         if_done<=0;
                         lsb_done<=0;
                     end else if(lsb_en) begin
@@ -73,6 +72,7 @@ module MemCtrl (
                         end else begin
                             stat<=LOAD;
                             mem_addr<=lsb_addr;
+                            lsb_r_data<=0;
                         end
                         pos<=0;
                         len<={4'b0,lsb_len};
@@ -93,29 +93,35 @@ module MemCtrl (
                         if_done<=1;
                         stat<=IDLE;
                         pos<=0;
-                        len<=0;
                     end else begin
                         pos<=pos+1;
                     end
                 end
                 LOAD: begin //remember 1 cycle delay
-                    case (pos)
-                        1: lsb_r_data[7:0]<=mem_in;
-                        2: lsb_r_data[15:8]<=mem_in;
-                        3: lsb_r_data[23:16]<=mem_in;
-                        4: lsb_r_data[31:24]<=mem_in;
-                    endcase
-                    if(pos+1==len) mem_addr<=0;
-                    else mem_addr<=mem_addr+1;
-                    if(pos==len) begin
-                        mem_addr<=0;
+                    if (rollback) begin //instruction covered
                         mem_rw<=0;
-                        lsb_done<=1;
+                        mem_addr<=0;
+                        lsb_done<=0;
                         stat<=IDLE;
                         pos<=0;
-                        len<=0;
                     end else begin
-                        pos<=pos+1;
+                        case (pos)
+                            1: lsb_r_data[7:0]<=mem_in;
+                            2: lsb_r_data[15:8]<=mem_in;
+                            3: lsb_r_data[23:16]<=mem_in;
+                            4: lsb_r_data[31:24]<=mem_in;
+                        endcase
+                        if(pos+1==len) mem_addr<=0;
+                        else mem_addr<=mem_addr+1;
+                        if(pos==len) begin
+                            mem_addr<=0;
+                            mem_rw<=0;
+                            lsb_done<=1;
+                            stat<=IDLE;
+                            pos<=0;
+                        end else begin
+                            pos<=pos+1;
+                        end
                     end
                 end
                 STORE: begin
@@ -134,7 +140,6 @@ module MemCtrl (
                         lsb_done<=1;
                         stat<=IDLE;
                         pos<=0;
-                        len<=0;
                     end else begin
                         pos<=pos+1;
                     end

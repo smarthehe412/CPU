@@ -41,10 +41,11 @@ module ALU (
             `FUNC3_XOR: res=calc1^calc2;
             `FUNC3_OR: res=calc1|calc2;
             `FUNC3_AND: res=calc1&calc2;
-            `FUNC3_SLL: res=calc1<<calc2[5:0];
-            `FUNC3_SRL:
+            `FUNC3_SLL: res=calc1<<calc2;
+            `FUNC3_SRL: begin
                 if(func1) res=$signed(calc1)>>calc2[5:0]; //SRA
                 else res=calc1>>calc2[5:0]; //SRL
+            end
             `FUNC3_SLT: res=$signed(calc1)<$signed(calc2);
             `FUNC3_SLTU: res=calc1<calc2;
         endcase
@@ -74,7 +75,6 @@ module ALU (
                 result<=1;
                 result_rob_pos<=rob_pos;
                 result_jump<=0;
-                result_pc<=pc+4;
                 case(opcode)
                     `OPCODE_ARITH, `OPCODE_ARITHI: result_val<=res;
                     `OPCODE_B: begin
@@ -82,7 +82,6 @@ module ALU (
                             result_jump<=1;
                             result_pc<=pc+imm;
                         end else begin
-                            result_jump<=0;
                             result_pc<=pc+4;
                         end
                     end

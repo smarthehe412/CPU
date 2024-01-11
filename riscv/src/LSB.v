@@ -83,6 +83,7 @@ module LSB(
             tail<=0;
             is_empty<=1;
             result<=0;
+            memc_en<=0;
             checkpoint<=`LSB_NPOS;
             for(i=0;i<`LSB_SIZE;i=i+1) begin
                 busy[i]<=0;
@@ -106,14 +107,14 @@ module LSB(
             end
             //clear head
             if(finish) begin
+                status<=IDLE;
+                memc_en<=0;
                 busy[head]<=0;
                 committed[head]<=0;
                 if(checkpoint[`LSB_POS_WID]==head) begin
                     checkpoint<=`LSB_NPOS;
                     is_empty<=1;
                 end
-                status<=IDLE;
-                memc_en<=0;
             end
         end else if(rdy) begin
             if(status==IDLE) begin
@@ -124,11 +125,11 @@ module LSB(
                     memc_rw<=is_store[head];
                     memc_addr<=rs1_val[head]+imm[head];
                     case(func3[head])
-                        `FUNC3_LB,`FUNC3_LBU,`FUNC3_SB: memc_len<=3'h1; 
-                        `FUNC3_LH,`FUNC3_LHU,`FUNC3_SH: memc_len<=3'h2;
-                                   `FUNC3_LW,`FUNC3_SW: memc_len<=3'h4;
+                        `FUNC3_LB,`FUNC3_LBU: memc_len<=3'h1; 
+                        `FUNC3_LH,`FUNC3_LHU: memc_len<=3'h2;
+                                   `FUNC3_LW: memc_len<=3'h4;
                     endcase
-                    memc_w_data<=rs2_val[head];
+                    if(is_store[head]) memc_w_data<=rs2_val[head];
                 end
             end else begin
                 if(memc_done) begin

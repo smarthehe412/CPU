@@ -70,9 +70,7 @@ module RS (
             ready[i]=0;
             if(busy[i]) begin
                 if(rs1_rob_id[i][4]==0&&rs2_rob_id[i][4]==0) ready[i]=1;
-                if(ready[i]) begin
-                    tmp_ready=i;
-                end
+                if(ready[i]) tmp_ready=i;
             end else begin
                 if(!decode_en || !tmp_free[4]) rs_full=0;
                 tmp_free=i;

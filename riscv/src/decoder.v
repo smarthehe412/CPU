@@ -89,28 +89,18 @@ module Decoder (
 
         if(!rst&&rdy&&!rollback&&if_inst_rdy) begin
             decode=1;
-            if(reg_rs1_rob_id[4]==0) begin//flag
-                rs1_val=reg_rs1_val;
-            end else if(rob_rs1_ready) begin
-                rs1_val=rob_rs1_val;
-            end else if(alu_result&&alu_result_rob_pos==rob_rs1_pos) begin
-                rs1_val=alu_result_val;
-            end else if(lsb_result&&lsb_result_rob_pos==rob_rs1_pos) begin
-                rs1_val=lsb_result_val;
-            end else begin
-                rs1_rob_id=reg_rs1_rob_id;
-            end
-            if(reg_rs2_rob_id[4]==0) begin//flag
-                rs2_val=reg_rs2_val;
-            end else if(rob_rs2_ready) begin
-                rs2_val=rob_rs2_val;
-            end else if(alu_result&&alu_result_rob_pos==rob_rs2_pos) begin
-                rs2_val=alu_result_val;
-            end else if(lsb_result&&lsb_result_rob_pos==rob_rs2_pos) begin
-                rs2_val=lsb_result_val;
-            end else begin
-                rs2_rob_id=reg_rs2_rob_id;
-            end
+            
+            if(reg_rs1_rob_id[4]==0) rs1_val=reg_rs1_val;
+            else if(rob_rs1_ready) rs1_val=rob_rs1_val;
+            else if(alu_result&&alu_result_rob_pos==rob_rs1_pos) rs1_val=alu_result_val;
+            else if(lsb_result&&lsb_result_rob_pos==rob_rs1_pos) rs1_val=lsb_result_val;
+            else rs1_rob_id=reg_rs1_rob_id;
+
+            if(reg_rs2_rob_id[4]==0) rs2_val=reg_rs2_val;
+            else if(rob_rs2_ready) rs2_val=rob_rs2_val;
+            else if(alu_result&&alu_result_rob_pos==rob_rs2_pos) rs2_val=alu_result_val;
+            else if(lsb_result&&lsb_result_rob_pos==rob_rs2_pos) rs2_val=lsb_result_val;
+            else rs2_rob_id=reg_rs2_rob_id;
 
             case(opcode)
                 `OPCODE_LUI, `OPCODE_AUIPC: begin

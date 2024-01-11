@@ -34,7 +34,7 @@ module IFetch (
     reg [`ADDR_WID] pc;
     reg status;
 
-    // iCache design:
+    // iCache design: (code copied from 1024th)
     // Block num 16, Block size 64 (bytes), 4 bytes per instruction, 16 instructions per block 
     // tag = pc[31:10], name a block 
     // index = pc[9:6], block index of pc
@@ -43,14 +43,12 @@ module IFetch (
     reg icache_is[`ICACHE_BLK_NUM-1:0];
     reg [`ICACHE_TAG_WID] icache_tag[`ICACHE_BLK_NUM-1:0];
     reg [`ICACHE_BLK_WID] icache_data[`ICACHE_BLK_NUM-1:0];
-
     wire [`ICACHE_BS_WID] pc_bs = pc[`ICACHE_BS_RANGE];
     wire [`ICACHE_IDX_WID] pc_index = pc[`ICACHE_IDX_RANGE];
     wire [`ICACHE_TAG_WID] pc_tag = pc[`ICACHE_TAG_RANGE];
     wire hit = icache_is[pc_index] && (icache_tag[pc_index] == pc_tag);
     wire [`ICACHE_IDX_WID] memc_pc_index = memc_pc[`ICACHE_IDX_RANGE];
     wire [`ICACHE_TAG_WID] memc_pc_tag = memc_pc[`ICACHE_TAG_RANGE];
-
     wire [`ICACHE_BLK_WID] cur_block_raw = icache_data[pc_index];
     wire [`INST_WID] cur_block[15:0];
     wire [`INST_WID] tmp_inst = cur_block[pc_bs];
@@ -71,18 +69,18 @@ module IFetch (
     // Branch history
     always @(posedge clk) begin
         if(rst) begin
-            for(i=0;i<`BP_SIZE;i=i+1) bp[i]<=0;
+            for(i=0;i<`BP_SIZE;i=i+1) bp[i]<=1;
         end else if (rdy&&rob_br) begin
             if(rob_br_jump) begin
-                if(bp[bp_index]<2'd3) bp[bp_index]<=bp[bp_index]+1;
+                if(bp[bp_index]<3) bp[bp_index]<=bp[bp_index]+1;
             end else begin
-                if(bp[bp_index]>2'd0) bp[bp_index]<=bp[bp_index]-1;
+                if(bp[bp_index]>0) bp[bp_index]<=bp[bp_index]-1;
             end
         end
     end
 
     // Branch Predictor
-    wire [`BHT_IDX_WID] pc_bht_index=pc[`BHT_IDX_RANGE];
+    wire [`BHT_IDX_WID] pc_bp_index=pc[`BHT_IDX_RANGE];
     always @(*) begin
         pre_pc=pc+4;
         pre_jump=0;
@@ -92,7 +90,7 @@ module IFetch (
                 pre_jump=1;
             end
             `OPCODE_B: begin
-                if (bp[pc_bht_index]>=2'd2) begin
+                if (bp[pc_bp_index]>=2'd2) begin
                     pre_pc=pc+{{20{tmp_inst[31]}},tmp_inst[7],tmp_inst[30:25],tmp_inst[11:8],1'b0};
                     pre_jump=1;
                 end
@@ -107,6 +105,7 @@ module IFetch (
             pc<=0;
             status<=IDLE;
             memc_en<=0;
+            memc_pc<=0;
             for(i=0;i<`ICACHE_BLK_NUM;i=i+1) begin
                 icache_is[i]<=0;
             end
