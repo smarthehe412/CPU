@@ -238,7 +238,6 @@ LSB t_LSB(
     .lsb_full(lsb_full),
     .decode_en(decoder_to_lsb_en),
     .decode_func3(func3),
-    .decode_func1(func1),
     .decode_rs1_val(rs1_val),
     .decode_rs1_rob_id(rs1_rob_id),
     .decode_rs2_val(rs2_val),

@@ -14,7 +14,6 @@ module LSB(
 
     input wire                decode_en,
     input wire [  `FUNC3_WID] decode_func3,
-    input wire                decode_func1,
     input wire [   `DATA_WID] decode_rs1_val,
     input wire [ `ROB_ID_WID] decode_rs1_rob_id,
     input wire [   `DATA_WID] decode_rs2_val,

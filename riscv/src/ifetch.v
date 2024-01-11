@@ -69,7 +69,7 @@ module IFetch (
     // Branch history
     always @(posedge clk) begin
         if(rst) begin
-            for(i=0;i<`BP_SIZE;i=i+1) bp[i]<=1;
+            for(i=0;i<`BP_SIZE;i=i+1) bp[i]<=0;
         end else if (rdy&&rob_br) begin
             if(rob_br_jump) begin
                 if(bp[bp_index]<3) bp[bp_index]<=bp[bp_index]+1;

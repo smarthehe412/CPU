@@ -115,11 +115,6 @@ module ROB(
                 //$display("%h %b",pc[head],opcode[head]);
                 reg_commit_rob_pos<=head;
                 case(opcode[head])
-                    `OPCODE_LUI, `OPCODE_AUIPC, `OPCODE_ARITH, `OPCODE_ARITHI, `OPCODE_JAL: begin
-                        reg_commit<=1;
-                        reg_commit_rd<=rd[head];
-                        reg_commit_val<=val[head];
-                    end
                     `OPCODE_JALR: begin
                         reg_commit<=1;
                         reg_commit_rd<=rd[head];
@@ -141,6 +136,11 @@ module ROB(
                     `OPCODE_S: begin
                         lsb_commit_store<=1;
                         lsb_rob_pos<=head;
+                    end
+                    default: begin
+                        reg_commit<=1;
+                        reg_commit_rd<=rd[head];
+                        reg_commit_val<=val[head];
                     end
                 endcase
             end
