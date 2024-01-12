@@ -88,6 +88,7 @@ module RS (
             alu_en<=0;
             if(tmp_ready[4]==0) begin //send to ALU
                 alu_en<=1;
+                busy[tmp_ready]<=0; //remember to clear
                 alu_opcode<=opcode[tmp_ready];
                 alu_func3<=func3[tmp_ready];
                 alu_func1<=func1[tmp_ready];
@@ -96,7 +97,6 @@ module RS (
                 alu_imm<=imm[tmp_ready];
                 alu_pc<=pc[tmp_ready];
                 alu_rob_pos<=rob_pos[tmp_ready];
-                busy[tmp_ready]<=0; //remember to clear
             end
             if(alu_result) begin //alu broadcast
                 for(i=0;i<`RS_SIZE;i=i+1) begin
@@ -123,6 +123,7 @@ module RS (
                 end
             end
             if(decode_en) begin //new instruction
+                busy[tmp_free]<=1; //remember to occupy
                 opcode[tmp_free]<=decode_opcode;
                 func3[tmp_free]<=decode_func3;
                 func1[tmp_free]<=decode_func1;
@@ -133,7 +134,6 @@ module RS (
                 pc[tmp_free]<=decode_pc;
                 imm[tmp_free]<=decode_imm;
                 rob_pos[tmp_free]<=decode_rob_pos;
-                busy[tmp_free]<=1; //remember to occupy
             end
         end
     end

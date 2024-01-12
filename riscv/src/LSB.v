@@ -124,9 +124,9 @@ module LSB(
                     memc_rw<=is_store[head];
                     memc_addr<=rs1_val[head]+imm[head];
                     case(func3[head])
-                        `FUNC3_LB,`FUNC3_LBU: memc_len<=3'h1; 
-                        `FUNC3_LH,`FUNC3_LHU: memc_len<=3'h2;
-                                   `FUNC3_LW: memc_len<=3'h4;
+                        `FUNC3_LB,`FUNC3_LBU: memc_len<=1; 
+                        `FUNC3_LH,`FUNC3_LHU: memc_len<=2;
+                                   `FUNC3_LW: memc_len<=4;
                     endcase
                     if(is_store[head]) memc_w_data<=rs2_val[head];
                 end
@@ -136,7 +136,7 @@ module LSB(
                     memc_en<=0;
                     busy[head]<=0;
                     committed[head]<=0;
-                    if(checkpoint[`LSB_POS_WID]==head) checkpoint<=`LSB_NPOS;
+                    if(checkpoint=={1'b0,head}) checkpoint<=`LSB_NPOS;
                     if(!is_store[head]) begin
                         result<=1;
                         case(func3[head])
@@ -152,7 +152,7 @@ module LSB(
             end
             if(rob_commit_store) begin
                 for(i=0;i<`LSB_SIZE;i=i+1) begin
-                    if(busy[i]&&rob_pos[i]==rob_rob_pos) begin
+                    if(busy[i]&&rob_pos[i]==rob_rob_pos&&!committed[i]) begin
                         committed[i]<=1;
                         checkpoint<={1'b0,i[`LSB_POS_WID]};
                     end

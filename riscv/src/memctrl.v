@@ -69,6 +69,7 @@ module MemCtrl (
                         if(lsb_rw) begin
                             stat<=STORE;
                             store_addr<=lsb_addr;
+                            //$display("write=%d, addr=%h",lsb_w_data,store_addr);
                         end else begin
                             stat<=LOAD;
                             mem_addr<=lsb_addr;
