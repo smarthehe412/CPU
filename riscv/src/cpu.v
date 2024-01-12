@@ -129,6 +129,7 @@ wire [`ROB_POS_WID] rob_to_reg_commit_rob_pos;
 // rob <-> lsb
 wire                rob_to_lsb_commit_store;
 wire [`ROB_POS_WID] rob_to_lsb_rob_pos;
+wire [`ROB_POS_WID] rob_to_lsb_rob_head_pos;
 
 // rs <-> alu
 wire                rs_to_alu_en;
@@ -264,7 +265,8 @@ LSB t_LSB(
     .lsb_result_val(lsb_result_val),
     .result(lsb_result),
     .result_rob_pos(lsb_result_rob_pos),
-    .result_val(lsb_result_val)
+    .result_val(lsb_result_val),
+    .rob_head_pos(rob_to_lsb_rob_head_pos)
 );
 
 MemCtrl t_MemCtrl(
@@ -276,6 +278,7 @@ MemCtrl t_MemCtrl(
     .mem_out(mem_dout),
     .mem_addr(mem_a),			
     .mem_rw(mem_wr),
+    .io_buffer_full(io_buffer_full),
     .if_en(if_to_memc_en),
     .if_pc(if_to_memc_pc),
     .if_done(memc_to_if_done),
@@ -347,7 +350,8 @@ ROB t_ROB(
     .alu_result_pc(alu_result_pc),
     .lsb_result(lsb_result),
     .lsb_result_rob_pos(lsb_result_rob_pos),
-    .lsb_result_val(lsb_result_val)
+    .lsb_result_val(lsb_result_val),
+    .lsb_rob_head_pos(rob_to_lsb_rob_head_pos)
 );
 
 RS t_RS(

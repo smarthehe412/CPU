@@ -44,7 +44,10 @@ module LSB(
 
     output reg                result,
     output reg [`ROB_POS_WID] result_rob_pos,
-    output reg [   `DATA_WID] result_val
+    output reg [   `DATA_WID] result_val,
+
+    // for FPGA
+    input wire [`ROB_POS_WID] rob_head_pos
 );
     localparam IDLE=0,WAIT=1;
     reg status;
@@ -63,7 +66,8 @@ module LSB(
     reg [`LSB_POS_WID] head,tail;
     reg [`LSB_ID_WID] checkpoint;
     reg is_empty;
-    wire is_solve=!is_empty && (rs1_rob_id[head][4]==0&&rs2_rob_id[head][4]==0) && ((!is_store[head] && !rollback) || committed[head]);
+    wire [`DATA_WID] head_addr=rs1_val[head]+imm[head];
+    wire is_solve=!is_empty && (rs1_rob_id[head][4]==0&&rs2_rob_id[head][4]==0) && (((head_addr[17:16]!=2'b11 || rob_pos[head]==rob_head_pos) && !is_store[head] && !rollback) || committed[head]);
     wire finish= status==WAIT && memc_done;
     wire [`LSB_POS_WID] nxt_head=head+finish;
     wire [`LSB_POS_WID] nxt_tail=tail+decode_en;

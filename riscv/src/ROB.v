@@ -46,7 +46,10 @@ module ROB(
     input wire [   `ADDR_WID] alu_result_pc,
     input wire                lsb_result,
     input wire [`ROB_POS_WID] lsb_result_rob_pos,
-    input wire [   `DATA_WID] lsb_result_val
+    input wire [   `DATA_WID] lsb_result_val,
+
+    //for FPGA
+    output wire [`ROB_POS_WID] lsb_rob_head_pos
 );
     reg                ready    [`ROB_SIZE-1:0];
     reg [`REG_POS_WID] rd       [`ROB_SIZE-1:0];
@@ -65,6 +68,7 @@ module ROB(
     wire is_nxt_empty=(nxt_head==nxt_tail)&&(is_empty||(is_commit&&!decode));
     assign rob_full=(nxt_head==nxt_tail)&&!is_nxt_empty;
     assign decode_nxt_pos=tail;
+    assign lsb_rob_head_pos=head;
 
     assign decode_rs1_ready=ready[decode_rs1_pos];
     assign decode_rs1_val=val[decode_rs1_pos];

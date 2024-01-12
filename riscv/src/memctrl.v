@@ -18,6 +18,9 @@ module MemCtrl (
     output reg  [31:0] mem_addr,			
     output reg         mem_rw,
 
+    //for FPGA
+    input wire io_buffer_full,
+
     input  wire                if_en,
     input  wire [   `ADDR_WID] if_pc,
     output reg                 if_done,
@@ -126,23 +129,25 @@ module MemCtrl (
                     end
                 end
                 STORE: begin
-                    mem_rw<=1;
-                    case (pos)
-                        0: mem_out<=lsb_w_data[7:0];
-                        1: mem_out<=lsb_w_data[15:8];
-                        2: mem_out<=lsb_w_data[23:16];
-                        3: mem_out<=lsb_w_data[31:24];
-                    endcase
-                    if(pos==0) mem_addr<=store_addr;
-                    else mem_addr<=mem_addr+1;
-                    if(pos==len) begin
-                        mem_addr<=0;
-                        mem_rw<=0;
-                        lsb_done<=1;
-                        stat<=IDLE;
-                        pos<=0;
-                    end else begin
-                        pos<=pos+1;
+                    if(store_addr[17:16]!=2'b11||!io_buffer_full) begin
+                        mem_rw<=1;
+                        case (pos)
+                            0: mem_out<=lsb_w_data[7:0];
+                            1: mem_out<=lsb_w_data[15:8];
+                            2: mem_out<=lsb_w_data[23:16];
+                            3: mem_out<=lsb_w_data[31:24];
+                        endcase
+                        if(pos==0) mem_addr<=store_addr;
+                        else mem_addr<=mem_addr+1;
+                        if(pos==len) begin
+                            mem_addr<=0;
+                            mem_rw<=0;
+                            lsb_done<=1;
+                            stat<=IDLE;
+                            pos<=0;
+                        end else begin
+                            pos<=pos+1;
+                        end
                     end
                 end 
             endcase
